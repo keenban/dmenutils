@@ -1,15 +1,16 @@
 #!/bin/sh
 
-# Find pass directory
-prefix=${PASSWORD_STORE_DIR-~/.password-store}
+# Use PASSWORD_STORE_DIR if set, otherwise default to ~/.password-store
+store_dir="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
 
-# Locate all password files, and select with dmenu
-chosen=$(find "$prefix" -type f -name '*.gpg' 2>/dev/null | \
-                 sed -e "s|^$prefix/||" -e 's/\.gpg$//' | 
-		 dmenu -i -l 30 "$@")
+# Locate and select password entry
+chosen=$(find "${store_dir}" -type f -name '*.gpg' 2>/dev/null | \
+          sed -e "s|^${store_dir}/||" -e 's/\.gpg$//' | \
+          dmenu -i -l 30 "$@")
 
-# Exit if none chosen
-[ -z $chosen ] && exit
+# Exit if no selection made
+[ -z "${chosen}" ] && exit
 
-pass show -c "$chosen" 2>/dev/null
-notify-send "'$chosen' copied to clipboard." &
+# Copy password to clipboard and notify
+pass show -c "${chosen}" >/dev/null 2>&1 && \
+    notify-send "'${chosen}' copied to clipboard" &
