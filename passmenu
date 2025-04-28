@@ -1,21 +1,17 @@
 #!/bin/sh
 
-typeit=0
-if [ "$1" = "--type" ]; then
-	typeit=1
-	shift
-fi
-
+# Find pass directory
 prefix=${PASSWORD_STORE_DIR-~/.password-store}
-password_files=$(find "$prefix" -type f -name '*.gpg' 2>/dev/null | \
+
+# Locate all password files
+pass_files=$(find "$prefix" -type f -name '*.gpg' 2>/dev/null | \
                  sed -e "s|^$prefix/||" -e 's/\.gpg$//')
+
 # Select password using dmenu
-password=$(echo "$password_files" | dmenu "$@")
+chosen=$(echo "$pass_files" | dmenu -i -l 30 "$@")
 
-[ -n $password ] || exit
+# Exit if none chosen
+[ -z $chosen ] && exit
 
-if [ $typeit -eq 0 ]; then
-	pass show -c "$password" 2>/dev/null
-else
-	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | xdotool type --clearmodifiers --file -
-fi
+pass show -c "$chosen" 2>/dev/null
+notify-send "'$chosen' copied to clipboard." &
