@@ -3,12 +3,10 @@
 # Find pass directory
 prefix=${PASSWORD_STORE_DIR-~/.password-store}
 
-# Locate all password files
-pass_files=$(find "$prefix" -type f -name '*.gpg' 2>/dev/null | \
-                 sed -e "s|^$prefix/||" -e 's/\.gpg$//')
-
-# Select password using dmenu
-chosen=$(echo "$pass_files" | dmenu -i -l 30 "$@")
+# Locate all password files, and select with dmenu
+chosen=$(find "$prefix" -type f -name '*.gpg' 2>/dev/null | \
+                 sed -e "s|^$prefix/||" -e 's/\.gpg$//' | 
+		 dmenu -i -l 30 "$@")
 
 # Exit if none chosen
 [ -z $chosen ] && exit
