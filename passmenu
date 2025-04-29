@@ -13,7 +13,7 @@ chosen=$(find "${store_dir}" -type f -name '*.gpg' 2>/dev/null | \
 
 # Copy to clipboard
 case $1 in
-	-o) pass otp -c "$chosen"
-	-u) pass show -c2 "$chosen"
-	-p) pass show -c "$chosen"
+	-o) pass otp -c "$chosen" ;; # Copy OTP
+	-u) pass show -c2 "$chosen" ;; # Copy username
+	-p) pass show -c "$chosen" ;; # Copy password
 esac >/dev/null 2>&1
