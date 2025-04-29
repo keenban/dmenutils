@@ -3,14 +3,17 @@
 # Use PASSWORD_STORE_DIR if set, otherwise default to ~/.password-store
 store_dir="${PASSWORD_STORE_DIR:-${HOME}/.password-store}"
 
-# Locate and select password entry
+# Locate and select pass entry
 chosen=$(find "${store_dir}" -type f -name '*.gpg' 2>/dev/null | \
           sed -e "s|^${store_dir}/||" -e 's/\.gpg$//' | \
-          dmenu -i -l 30 "$@")
+          dmenu -i -l 30)
 
 # Exit if no selection made
 [ -z "${chosen}" ] && exit
 
-# Copy password to clipboard and notify
-pass show -c "${chosen}" >/dev/null 2>&1 && \
-    notify-send "'${chosen}' copied to clipboard" &
+# Copy to clipboard
+case $1 in
+	-o) pass otp -c "$chosen"
+	-u) pass show -c2 "$chosen"
+	-p) pass show -c "$chosen"
+esac >/dev/null 2>&1
